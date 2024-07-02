@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Form;
 
+use App\Entity\Car;
 use App\Entity\Client;
 use App\Entity\Enum\BodyType;
 use Doctrine\ORM\EntityRepository;
@@ -13,6 +14,8 @@ use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 class CarType extends AbstractType
 {
@@ -58,6 +61,23 @@ class CarType extends AbstractType
                 'choice_label' => 'fullName',
                 'placeholder' => 'Select car client'
             ]);
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $event){
+            $car = $event->getData();
+            /** @var Car $car */
+
+            foreach ($car->getClients() as $client) {
+                $client->removeCar($car);
+            }
+        })
+            ->addEventListener(FormEvents::SUBMIT, function(FormEvent $event){
+                $car = $event->getData();
+                /** @var Car $car */
+                /** @var Client $client */
+
+                foreach ($car->getClients() as $client) {
+                    $client->addCar($car);
+                }
+            });
 
     }
 

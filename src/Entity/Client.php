@@ -106,4 +106,11 @@ class Client
             $this->orders->add($order);
         }
     }
+
+    public function removeCar(Car $car): void
+    {
+        if ($this->cars->contains($car)) {
+            $this->cars->removeElement($car);
+        }
+    }
 }
