@@ -10,6 +10,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Attribute as Serializer;
+
 
 #[ORM\Entity(repositoryClass: CarRepository::class)]
 #[ORM\Table(name: 'car')]
@@ -18,16 +20,20 @@ class Car
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
+    #[Serializer\Groups(['car_item'])]
     private int $id;
 
     #[Assert\Length(min: 3, minMessage: ' Brand must be longer than {{ limit }}characters')]
     #[ORM\Column(name: 'brand', type: 'string', length: 150)]
+    #[Serializer\Groups(['car_item'])]
     private string $brand;
 
     #[ORM\Column(name: 'model', type: 'string', length: 50)]
+    #[Serializer\Groups(['car_item'])]
     private string $model;
 
     #[ORM\Column(name: 'year', type: 'integer')]
+    #[Serializer\Groups(['car_item'])]
     private int $year;
 
     #[Assert\Length(min: 3, minMessage: 'Color must be longer than {{ limit }}characters')]
@@ -144,6 +150,11 @@ class Car
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
     }
 
 }

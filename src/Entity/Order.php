@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute as Serializer;
+
 
 
 #[ORM\Entity]
@@ -16,12 +18,15 @@ class Order
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
+    #[Serializer\Groups(['order_item'])]
     private int $id;
 
     #[ORM\Column(name: 'vin_code',type: 'string')]
+    #[Serializer\Groups(['order_item'])]
     private string $vinCode;
 
     #[ORM\Column(name: 'order_price', type: 'integer')]
+    #[Serializer\Groups(['order_item'])]
     private int $orderPrice;
 
     #[ORM\JoinColumn(name: 'car_id')]
@@ -94,5 +99,15 @@ class Order
             $this->orderWorks->add($orderWork);
         }
 
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
     }
 }

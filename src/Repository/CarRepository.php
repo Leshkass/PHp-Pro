@@ -28,7 +28,7 @@ class CarRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findPage(int $page =1)
+    public function findPage(int $page = 1)
     {
         return $this->createQueryBuilder('c')
             ->orderBy('c.id')

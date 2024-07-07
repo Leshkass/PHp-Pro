@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+        <h2>Sign up for a Garage account</h2>
+
+        {{ form_start(form, { attr: { class: 'pure-form pure-form-stacked'}}) }}
+        {{ form_errors(form) }}
+
+    <div class="w-25">
+        {{ form_row(form.email) }}
+
+    </div>
+    <div class="w-25">
+        {{ form_row(form.password) }}
+    </div>
+
+        <button type="submit" class="btn btn-outline-primary">Sign Up</button>
+        {{ form_end(form) }}
+
+
+    <div class="or-signup">
+        Already have an account? <a href="{{ path('app_login') }}">Log in</a>
+    </div>
+{% endblock %}

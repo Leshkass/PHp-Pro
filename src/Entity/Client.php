@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Entity\Exceptions\InvalidName;
 use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute as Serializer;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 #[ORM\Table(name: 'client')]
@@ -17,24 +17,30 @@ class Client
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
+    #[Serializer\Groups(['client_list', 'client_item', 'client_update'])]
     private int $id;
 
     #[ORM\Column(name: 'first_name', type: 'string', length: 50)]
+    #[Serializer\Groups(['client_list', 'client_item', 'client_update'])]
     private string $firstName;
 
     #[ORM\Column(name: 'last_name', type: 'string', length: 50)]
+    #[Serializer\Groups(['client_list', 'client_item', 'client_update' ])]
     private string $lastName;
 
     #[ORM\Column(name: 'email', type: 'string', length: 150)]
+    #[Serializer\Groups(['client_item', 'client_update'])]
     private string $email;
 
-    #[ORM\OneToMany(targetEntity: Order::class,mappedBy: 'client')]
+    #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'client')]
+    #[Serializer\Groups(['client_item'])]
     private Collection $orders;
 
     #[ORM\JoinTable(name: 'cars_client')]
     #[ORM\JoinColumn(name: 'client_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'car_id', referencedColumnName: 'id')]
     #[ORM\ManyToMany(targetEntity: Car::class, inversedBy: 'clients')]
+    #[Serializer\Groups(['client_item'])]
     private Collection $cars;
 
     public function __construct()
@@ -56,22 +62,6 @@ class Client
         }
     }
 
-    /**
-     * @throws InvalidName
-     */
-    public function setFirstName(string $firstName): void
-    {
-        if (strlen($firstName) <= 2) {
-            throw new InvalidName('First name must be at least 2 characters long');
-        }
-        $this->firstName = $firstName;
-    }
-
-    public function setLastName(string $surName): void
-    {
-        $this->lastName = $surName;
-    }
-
     public function getFullName(): string
     {
         return $this->firstName . ' ' . $this->lastName;
@@ -82,11 +72,6 @@ class Client
         return $this->email;
     }
 
-    public function setEmail(string $email): void
-    {
-        $this->email = $email;
-    }
-
     public function getFullInfo(): array
     {
         return [
@@ -95,7 +80,7 @@ class Client
         ];
     }
 
-    public function getOrder(): Collection
+    public function getOrders(): Collection
     {
         return $this->orders;
     }
@@ -112,5 +97,39 @@ class Client
         if ($this->cars->contains($car)) {
             $this->cars->removeElement($car);
         }
+    }
+    public function setFirstName(string $firstName): void
+    {
+        $this->firstName = $firstName;
+    }
+
+    public function setLastName(string $lastName): void
+    {
+        $this->lastName = $lastName;
+    }
+
+    public function setEmail(string $email): void
+    {
+        $this->email = $email;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getFirstName(): string
+    {
+        return $this->firstName;
+    }
+
+    public function getLastName(): string
+    {
+        return $this->lastName;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
     }
 }
