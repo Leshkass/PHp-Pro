@@ -10,6 +10,7 @@ use App\Manager\ClientManager;
 use App\Repository\ClientRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -37,15 +38,30 @@ class ClientController extends AbstractController
 
     // get one
     #[Route('/{id}', methods: ['GET'], format: 'json')]
-    public function get(Client $client, SerializerInterface $serializer): Response
+    public function get(Client $client, SerializerInterface $serializer, CacheItemPoolInterface $cache): Response
     {
-        return new Response(
-            $serializer->serialize($client, 'json',
-                [
-                    'groups' => ['client_item', 'order_item', 'car_item']
-                ]
-            )
-        );
+        if ($client) {
+            $clientItem = $cache->getItem('client.search' . $client->getFirstName());
+
+            if (!$clientItem->isHit()) {
+                $clientItem->set($client);
+                $clientItem->expiresAt(new \DateTime('+1 hour'));
+                $cache->save($clientItem);
+            }
+            return new Response(
+                $serializer->serialize($client, 'json',
+                    [
+                        'groups' => ['client_item', 'order_item', 'car_item']
+                    ]
+                )
+            );
+
+
+        }
+
+        return new Response();
+
+
     }
 
 

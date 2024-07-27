@@ -83,4 +83,26 @@ class CarController extends AbstractController
 
         return $this->render('crud/edit.html.twig', ['car' => $car, 'form' => $form]);
     }
+
+    #[Route('/search',  name: 'app_crud_search')]
+    public function search(Request $request, CarRepository $carRepository): Response
+    {
+        $searchString = $request->get('searchString');
+
+        if ($searchString === null) {
+            throw new \UnexpectedValueException('Search field can not be empty');
+        }
+
+        $cars = $carRepository->findAllByBrand($searchString);
+
+        foreach ($cars as $car) {
+
+            foreach ($car->getFullInfo() as $item) {
+
+                echo  $item . PHP_EOL;
+            }
+        }
+
+        return new Response();
+    }
 }

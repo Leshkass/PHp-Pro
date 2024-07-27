@@ -27,17 +27,28 @@ class CarRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
     public function findPage(int $page = 1)
     {
         return $this->createQueryBuilder('c')
             ->orderBy('c.id')
             ->getQuery()
+            ->enableResultCache(600)
             ->setFirstResult(self::CAR_PAGE * $page - self::CAR_PAGE)
             ->setMaxResults(self::CAR_PAGE)
             ->getResult();
 
     }
 
+    /**
+     * @return Car[]
+     */
+    public function findAllByBrand(string $brand): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.brand = :brand')
+            ->setParameter('brand', $brand)
+            ->getQuery()
+            ->getResult();
+    }
 
 }

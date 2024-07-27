@@ -36,5 +36,13 @@ services:
     volumes:
       - mysql:/var/lib/mysql
 
+
+  redis:
+    image: redis:latest
+    volumes:
+        - redis:/data
+
+
 volumes:
   mysql:
+  redis:

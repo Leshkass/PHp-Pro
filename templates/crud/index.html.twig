@@ -2,7 +2,6 @@
 
 
 {% block body %}
-
     <h2>Car list</h2>
     <table class="table">
         <thead class="thead-light">
@@ -45,5 +44,16 @@
 
         | <a href="{{ path('app_crud_car_index', {'page': app.request.get('page',1) + 1}) }}">Next</a>
     </p>
+
+    <form class="row" method="GET" action="{{ path('app_crud_search') }}">
+        <label  class="col-1 col-form-label">Search Car</label>
+        <div class="col-2">
+            <input type="text" name="searchString"  required="required" class="form-control" placeholder="car">
+        </div>
+
+        <div class="col-1">
+            <input type="submit" class="btn btn-outline-info" value="Search">
+        </div>
+    </form>
 
 {% endblock %}
