@@ -25,6 +25,15 @@ class ClientRepository extends ServiceEntityRepository
 
     }
 
+    public function findByName(string $name): array
+    {
+        return $this->getEntityManager()
+            ->getConnection()
+            ->executeQuery('SELECT * FROM client c WHERE c.first_name LIKE :first_name' , ['first_name' => "%$name%"])
+            ->fetchAssociative();
+
+    }
+
 
 
 

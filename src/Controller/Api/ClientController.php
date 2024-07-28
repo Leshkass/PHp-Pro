@@ -37,33 +37,39 @@ class ClientController extends AbstractController
     }
 
     // get one
-    #[Route('/{id}', methods: ['GET'], format: 'json')]
+    #[Route('/{id}', requirements: ['id' => '\d+'], methods: ['GET'], format: 'json')]
     public function get(Client $client, SerializerInterface $serializer, CacheItemPoolInterface $cache): Response
     {
-        if ($client) {
-            $clientItem = $cache->getItem('client.search' . $client->getFirstName());
+        $clientItem = $cache->getItem('client.search' . $client->getId());
 
-            if (!$clientItem->isHit()) {
-                $clientItem->set($client);
-                $clientItem->expiresAt(new \DateTime('+1 hour'));
-                $cache->save($clientItem);
-            }
-            return new Response(
-                $serializer->serialize($client, 'json',
-                    [
-                        'groups' => ['client_item', 'order_item', 'car_item']
-                    ]
-                )
-            );
-
-
+        if (!$clientItem->isHit()) {
+            $clientItem->set([$client->getFirstName(), $client->getLastName()]);
+            $clientItem->expiresAt(new \DateTime('+1 hour'));
+            $cache->save($clientItem);
         }
-
-        return new Response();
-
-
+        return new Response(
+            $serializer->serialize($clientItem->get(), 'json',
+                [
+                    'groups' => ['client_item', 'order_item', 'car_item']
+                ]
+            )
+        );
     }
 
+    //search-by-name
+    #[Route('/search-by-name', name: 'api_search', methods: ["GET"])]
+    public function search(#[MapQueryParameter] string $name, ClientRepository $clientRepository, CacheItemPoolInterface $cache): Response
+    {
+        $namesItem = $cache->getItem('name.search' . $name);
+
+        if (!$namesItem->isHit()) {
+            $namesItem->set($clientRepository->findByName($name));
+            $namesItem->expiresAt(new \DateTime('+ 2 hour'));
+            $cache->save($namesItem);
+        }
+
+        return new JsonResponse($namesItem->get());
+    }
 
     // create
     #[Route('', methods: ['POST'], format: 'json')]
